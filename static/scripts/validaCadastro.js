@@ -12,53 +12,64 @@ const msgError = document.getElementsByClassName("msgError");
 
 /* ------ FUNÇÃO PARA RENDERIZAR AS DIFERENTES MENSAGENS DE ERRO! ------ */
 const createDisplayMsgError = (mensagem) => {
-  msgError[0].textContent = mensagem;
+  if (msgErrorElements.length > 0) {
+    msgErrorElements[0].textContent = mensagem;
+    msgErrorElements[0].style.display = mensagem ? "block" : "none";
+  }
 };
 /* --------------------------------------------------------------------- */
 
 /* ---------------- FUNÇÃO PARA VERIFICAR O NOME ----------------------- */
 const checkNome = () => {
-  const nomeRegex = /^[A-Za-zÀ-ÿ\s]+$/;
-  return nomeRegex.test(nome.value);
+  const nomeRegex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+  return nomeRegex.test(nome.value.trim());
 };
 /* --------------------------------------------------------------------- */
 
 /* ---------- FUNÇÃO PARA VERIFICAR O EMAIL --------------------- */
-const checkEmail = (email) => {
-  const partesEmail = email.split("@");
-
-  if (
-    (partesEmail.length === 2 &&
-      partesEmail[1].toLowerCase() === "gmail.com") ||
-    (partesEmail.length === 2 &&
-      partesEmail[1].toLowerCase() === "outlook.com") ||
-    (partesEmail.length === 2 && partesEmail[1].toLowerCase() === "hotmail.com")
-  ) {
-    return true;
-  } else {
+const checkEmail = (emailValue) => {
+  const emailTrimmed = emailValue.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailTrimmed)) {
     return false;
   }
+
+  const partesEmail = emailTrimmed.split("@");
+  if (partesEmail.length === 2) {
+    const domain = partesEmail[1].toLowerCase();
+    const allowedDomains = [
+      "gmail.com",
+      "outlook.com",
+      "hotmail.com",
+      "icloud.com",
+      "yahoo.com",
+    ];
+    return true;
+  }
+  return false;
 };
 /* --------------------------------------------------------------------- */
 
 /* ---------- FUNÇÃO PARA VERIFICAR IGUALDADE DAS SENHAS --------------- */
 function checkPasswordMatch() {
-  return senha.value === confirmarSenha.value ? true : false;
+  return senha.value === confirmarSenha.value;
 }
 /* --------------------------------------------------------------------- */
 
 /* ----------- FUNÇÃO PARA INSERIR MASCARA NO TELEFONE ----------------- */
 
 function maskPhoneNumber(event) {
-  let celular = event.target.value;
+  let celularValue = event.target.value;
 
-  if (/[A-Za-zÀ-ÿ]/.test(celular)) {
+  if (/[A-Za-zÀ-ÿ]/.test(celularValue)) {
     createDisplayMsgError("O celular deve conter apenas números!");
+    event.target.value = celularValue.replace(/[A-Za-zÀ-ÿ]/g, "");
+    celularValue = event.target.value;
   } else {
     createDisplayMsgError("");
   }
 
-  celular = celular.replace(/\D/g, ""); // Remove os caracteres não numéricos
+  celular = celularValue.replace(/\D/g, ""); // Remove os caracteres não numéricos
 
   if (celular.length > 11) {
     celular = celular.substring(0, 11);
